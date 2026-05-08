@@ -1,4 +1,3 @@
-import React from 'react';
 import { ProjectCard } from './Card';
 
 export function ProjectsSection() {

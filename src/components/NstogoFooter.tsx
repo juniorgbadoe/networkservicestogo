@@ -1,238 +1,205 @@
-import React from 'react';
-import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram, ArrowUp, ExternalLink } from 'lucide-react';
-import { Link, useNavigate } from 'react-router';
+import { ArrowUp, Facebook, Instagram, Linkedin, Mail, MapPin, Phone, Twitter } from 'lucide-react';
+import { Link } from 'react-router';
+import LogoNS from '../assets/logo.png';
+import { useSiteShell, type NavigationItem } from '../hooks/useSiteContent';
+
+function resolveLogoSrc(logo: string) {
+  if (!logo) {
+    return LogoNS;
+  }
+
+  if (logo.startsWith('http://') || logo.startsWith('https://') || logo.startsWith('/')) {
+    return logo;
+  }
+
+  return LogoNS;
+}
+
+function isExternalLink(item: NavigationItem) {
+  return Boolean(item.url && /^https?:\/\//i.test(item.url));
+}
 
 export function NstogoFooter() {
-  const navigate = useNavigate();
-  
+  const { settings, navigation } = useSiteShell();
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const footerSections = {
-    services: [
-      { label: 'Maintenance informatique', path: '/services' },
-      { label: 'Déploiement des réseaux d’entreprise', path: '/services' },
-      { label: 'Câblage réseau informatique', path: '/services' },
-      { label: 'Configuration d’infrastructure réseau', path: '/services' }
-    ],
-    company: [
-      { label: 'À propos', path: '/about' },
-      { label: 'Nos réalisations', path: '/projects' },
-      { label: 'Témoignages', path: '/testimonials' },
-      { label: 'Contact', path: '/contact' },
-      { label: 'Carrières', url: '#' },
-      { label: 'Blog', url: '#'}
-    ],
-    resources: [
-      { label: 'Documentation', url: '#' },
-      { label: 'Centre d\'aide', url: '#' },
-      { label: 'API', url: '#' },
-      { label: 'Status', url: '#' },
-      { label: 'Changelog', url: '#' }
-    ],
-    legal: [
-      { label: 'Mentions légales', url: '#' },
-      { label: 'Politique de confidentialité', url: '#' },
-      { label: 'CGV', url: '#' },
-      { label: 'CGU', url: '#' },
-      { label: 'Cookies', url: '#' }
-    ]
-  };
-
   const socialLinks = [
-    { icon: <Linkedin size={20} />, label: 'LinkedIn', url: '#' },
-    { icon: <Twitter size={20} />, label: 'Twitter', url: '#' },
-    { icon: <Facebook size={20} />, label: 'Facebook', url: '#' },
-    { icon: <Instagram size={20} />, label: 'Instagram', url: '#' }
-  ];
+    { icon: <Linkedin size={18} />, label: 'LinkedIn', url: settings.social_linkedin },
+    { icon: <Twitter size={18} />, label: 'Twitter', url: settings.social_twitter },
+    { icon: <Facebook size={18} />, label: 'Facebook', url: settings.social_facebook },
+    { icon: <Instagram size={18} />, label: 'Instagram', url: settings.social_instagram },
+  ].filter((item) => item.url);
+
+  const contactLines = [settings.contact_phone1, settings.contact_phone2].filter(Boolean);
+  const logoSrc = resolveLogoSrc(settings.site_logo);
+
+  const renderFooterLink = (item: NavigationItem, key: string) => {
+    if (item.url) {
+      return (
+        <a
+          key={key}
+          href={item.url}
+          target={isExternalLink(item) ? '_blank' : undefined}
+          rel={isExternalLink(item) ? 'noopener noreferrer' : undefined}
+          className="text-white/75 hover:text-white transition-colors text-[13px] hover:translate-x-1 inline-block transform duration-200"
+        >
+          {item.label}
+        </a>
+      );
+    }
+
+    return (
+      <Link
+        key={key}
+        to={item.path || '/'}
+        className="text-white/75 hover:text-white transition-colors text-[13px] hover:translate-x-1 inline-block transform duration-200"
+      >
+        {item.label}
+      </Link>
+    );
+  };
 
   return (
     <footer className="bg-gradient-to-br from-[var(--secondary)] to-[#0D1F35] text-white relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30"></div>
-      
+
       {/* Scroll to Top Button */}
       <button
         onClick={scrollToTop}
-        className="absolute -top-7 left-1/2 -translate-x-1/2 w-14 h-14 bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] rounded-full flex items-center justify-center shadow-2xl hover:shadow-[0_20px_50px_rgba(0,85,255,0.4)] transition-all duration-300 hover:scale-110 z-20"
+        className="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] rounded-full flex items-center justify-center shadow-xl hover:shadow-[0_12px_28px_rgba(0,85,255,0.30)] transition-all duration-300 hover:scale-110 z-20"
       >
-        <ArrowUp size={24} />
+        <ArrowUp size={18} />
       </button>
 
-      <div className="container relative z-10">
+      {/* NOTE: container plus étroit + padding réduit */}
+      <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-5 lg:px-6">
         {/* Main Footer Content */}
-        <div className="pt-20 pb-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12">
-          {/* Company Info - Takes more space */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* Logo */}
-            <div className="flex items-center gap-3 group cursor-pointer" onClick={() => navigate('/')}>
+        {/* NOTE: grille centrée, colonnes 1 -> md:3 pour équilibrer (logo/desc | services | contact à droite) */}
+        <div className="pt-10 pb-6 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-start">
+
+          {/* Colonne 1 : Logo + description (contact déplacé à droite) */}
+          <div className="space-y-4">
+            {/* Logo + titre */}
+            <Link to="/" className="flex items-center gap-3 group cursor-pointer">
               <div className="relative">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-shadow">
-                  <span className="text-white font-bold text-2xl tracking-tight">NS</span>
-                </div>
-                <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[var(--accent-turquoise)] rounded-full border-2 border-[var(--secondary)]"></div>
+                <img src={logoSrc} alt={`${settings.site_name} Logo`} className="w-8 h-8 rounded-lg object-cover group-hover:scale-105 transition-transform" />
               </div>
               <div className="flex flex-col">
-                <span className="text-3xl font-extrabold leading-none tracking-tight">
-                  Network Service
+                <span className="text-xl font-extrabold leading-none tracking-tight">
+                  {settings.site_name}
                 </span>
                 <span className="text-[11px] text-white/60 font-medium tracking-wide uppercase">
-                  Digital Solutions
+                  {settings.site_tagline}
                 </span>
               </div>
-            </div>
+            </Link>
 
-            <p className="text-white/80 leading-relaxed text-[15px] pr-8">
-              Votre partenaire technologique pour relever les défis numériques d’aujourd’hui et de demain. Network Service est un cabinet spécialisée en informatique réseau, services digitaux et développement de sites web. Nous vous aidons à bâtir une infrastructure performante, à optimiser vos outils numériques et à sécuriser vos environnements.
+            {/* NOTE: texte réduit + line-height ajustée */}
+            <p className="text-white/80 leading-relaxed text-[13px]">
+              {settings.footer_description}
             </p>
 
-            {/* Contact Info */}
-            <div className="space-y-3">
-              <a href="mailto:contact@networkservice.com" className="flex items-center gap-3 text-white/70 hover:text-white transition-colors group">
-                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                  <Mail size={18} />
-                </div>
-                <span className="text-sm">contact@nstogo.com</span>
-              </a>
-              <a href="tel:+33176543210" className="flex items-center gap-3 text-white/70 hover:text-white transition-colors group">
-                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                  <Phone size={18} />
-                </div>
-                <span className="text-sm">+228 79 71 00 22</span>
-                <span className="text-sm">+228 91 54 14 48</span>
-              </a>
-              <div className="flex items-start gap-3 text-white/70">
-                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                  <MapPin size={18} />
-                </div>
-                <span className="text-sm leading-relaxed"><br /></span>
-              </div>
-            </div>
-
-            {/* Social Links */}
-            {/*<div className="pt-4">
-              <p className="text-sm font-semibold mb-3">Suivez-nous</p>
-              <div className="flex gap-3">
-                {socialLinks.map((social, index) => (
+            {socialLinks.length > 0 && (
+              <div className="flex flex-wrap gap-3 pt-2">
+                {socialLinks.map((social) => (
                   <a
-                    key={index}
+                    key={social.label}
                     href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center"
                     aria-label={social.label}
-                    className="w-11 h-11 rounded-lg bg-white/10 hover:bg-gradient-to-br hover:from-[var(--primary)] hover:to-[var(--primary-light)] flex items-center justify-center transition-all duration-300 hover:scale-110"
                   >
                     {social.icon}
                   </a>
                 ))}
               </div>
-            </div>*/}
+            )}
           </div>
 
-          {/* Services */}
-          <div className="lg:col-span-2">
-            <h3 className="font-bold text-lg mb-6">Services</h3>
-            <ul className="space-y-3">
-              {footerSections.services.map((link, index) => (
-                <li key={index}>
-                  <Link
-                    to={link.path}
-                    className="text-white/70 hover:text-white transition-colors text-sm hover:translate-x-1 inline-block transform duration-200"
-                  >
-                    {link.label}
-                  </Link>
+          {/* Colonne 2 : Services (visible) */}
+          <div className="md:mt-4">
+            <h3 className="font-bold text-sm mb-3 text-gray-100 dark:text-white">Services</h3>
+            <ul className="space-y-2">
+              {navigation.footerServices.map((link, index) => (
+                <li key={`footer-service-${index}`}>
+                  {renderFooterLink(link, `footer-service-link-${index}`)}
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Company */}
-         {/* <div className="lg:col-span-2">
-            <h3 className="font-bold text-lg mb-6">Entreprise</h3>
-            <ul className="space-y-3">
-              {footerSections.company.map((link, index) => (
-                <li key={index}>
-                  {link.path ? (
-                    <Link
-                      to={link.path}
-                      className="text-white/70 hover:text-white transition-colors text-sm hover:translate-x-1 inline-block transform duration-200"
-                    >
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a
-                      href={link.url}
-                      className="text-white/70 hover:text-white transition-colors text-sm hover:translate-x-1 inline-flex items-center gap-1 transform duration-200"
-                    >
-                      {link.label}
-                      <ExternalLink size={12} />
+          {/* Colonne 3 : Contact (EMAIL + NUMÉROS + ADRESSE) – bien aligné à droite */}
+          <div className="space-y-3 md:text-right md:mt-10">
+            {/* Email */}
+            <a
+              href={`mailto:${settings.contact_email}`}
+              className="flex md:justify-end items-center gap-2 text-white/75 hover:text-white transition-colors group"
+            >
+              <span className="text-[13px] order-2 md:order-1">{settings.contact_email}</span>
+              <div className="order-1 md:order-2 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors flex-shrink-0">
+                <Mail size={14} />
+              </div>
+            </a>
+
+            {/* Téléphones */}
+
+            <div className="flex items-start justify-start md:justify-end gap-2 text-white/75">
+              {/* Icône en 1er en mobile, en 2e en desktop */}
+              <div className="order-1 md:order-2 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                <Phone size={14} />
+              </div>
+
+              {/* Numéros en 2e en mobile, en 1er en desktop */}
+              <div className="order-2 md:order-1 flex flex-col text-[13px] leading-snug">
+                {contactLines.map((phone, index) => (
+                  <div key={`footer-phone-${index}`} className="md:text-right">
+                    <a href={`tel:${phone.replace(/\s+/g, '')}`} className="hover:text-white transition-colors whitespace-nowrap">
+                      {phone}
                     </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>*/}
+                  </div>
+                ))}
+              </div>
+            </div>
 
-          {/* Resources */}
-         {/* <div className="lg:col-span-2">
-            <h3 className="font-bold text-lg mb-6">Ressources</h3>
-            <ul className="space-y-3">
-              {footerSections.resources.map((link, index) => (
-                <li key={index}>
-                  <a
-                    href={link.url}
-                    className="text-white/70 hover:text-white transition-colors text-sm hover:translate-x-1 inline-flex items-center gap-1 transform duration-200"
-                  >
-                    {link.label}
-                    <ExternalLink size={12} />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>*/}
 
-          {/* Newsletter */}
-         {/* <div className="lg:col-span-2">
-            <h3 className="font-bold text-lg mb-6">Newsletter</h3>
-            <p className="text-white/70 text-sm mb-4 leading-relaxed">
-              Restez informé de nos actualités et offres exclusives.
-            </p>
-            <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); alert('Merci pour votre inscription !'); }}>
-              <input
-                type="email"
-                placeholder="Votre email"
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:border-[var(--primary)] focus:bg-white/15 transition-all text-sm"
-                required
-              />
-              <button
-                type="submit"
-                className="w-full px-4 py-3 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] rounded-xl font-semibold hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm"
-              >
-                S'inscrire
-              </button>
-            </form>
-          </div>*/}
+            {/* Adresse (si tu veux afficher une adresse, mets le texte entre les balises <span>) */}
+
+            <div className="flex items-start justify-start md:justify-end gap-2 text-white/75">
+              {/* Icône en 1er en mobile, en 2e en desktop */}
+              <div className="order-1 md:order-2 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                <MapPin size={14} />
+              </div>
+
+              {/* Texte en 2e en mobile, en 1er en desktop */}
+              <span className="order-2 md:order-1 text-[13px] leading-relaxed md:text-right">
+                {settings.contact_address}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/10 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            {/* Copyright */}
-            <p className="text-white/60 text-sm">
-              © {new Date().getFullYear()} Network Service. Tous droits réservés.
+        {/* NOTE: padding réduit et container compact */}
+        <div className="border-t border-white/10 py-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3">
+            <p className="text-white/60 text-[12px]">
+              © {new Date().getFullYear()} {settings.site_name}. {settings.footer_copyright}
             </p>
 
-            {/* Legal Links */}
-            {/*<div className="flex flex-wrap justify-center gap-6 text-sm">
-              {footerSections.legal.map((link, index) => (
-                <a
-                  key={index}
-                  href={link.url}
-                  className="text-white/60 hover:text-white transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>*/}
+            {navigation.footerLegal.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-5 text-sm">
+                {navigation.footerLegal.map((link, index) => (
+                  <span key={`footer-legal-${index}`} className="text-white/60 hover:text-white transition-colors">
+                    {renderFooterLink(link, `footer-legal-link-${index}`)}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -8,6 +8,7 @@ interface ButtonProps {
   className?: string;
   type?: 'button' | 'submit' | 'reset';
   icon?: React.ReactNode;
+  disabled?: boolean;
 }
 
 export function Button({ 
@@ -17,7 +18,8 @@ export function Button({
   onClick, 
   className = '',
   type = 'button',
-  icon
+  icon,
+  disabled = false,
 }: ButtonProps) {
   const baseStyles = 'inline-flex items-center justify-center gap-2.5 rounded-xl font-semibold transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
   
@@ -39,6 +41,7 @@ export function Button({
     <button
       type={type}
       onClick={onClick}
+      disabled={disabled}
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
     >
       {icon && <span className="flex-shrink-0">{icon}</span>}

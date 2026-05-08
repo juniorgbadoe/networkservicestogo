@@ -1,179 +1,134 @@
-//import { Code2, Cloud, Palette, TrendingUp, Database, Lock, Smartphone, Globe } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Wrench, Network, Cable, ServerCog, ShieldCheck, Link } from 'lucide-react';
+import { useNavigate } from 'react-router';
 
-import { Wrench, Network, Cable, ServerCog, ShieldCheck } from 'lucide-react';
+const iconMap: Record<string, React.ReactNode> = {
+  Wrench: <Wrench size={28} />,
+  Network: <Network size={28} />,
+  Cable: <Cable size={28} />,
+  ServerCog: <ServerCog size={28} />,
+  ShieldCheck: <ShieldCheck size={28} />,
+  Link: <Link size={28} />,
+};
+
+const API_URL = import.meta.env.VITE_API_URL || '';
+
+interface Service {
+  id: number;
+  titre: string;
+  description: string;
+  icon: string;
+  couleur: string;
+  features: string[];
+}
+
+const defaultServices = [
+  {
+    id: 0,
+    titre: 'Maintenance informatique',
+    description: 'La maintenance informatique assure le bon fonctionnement des systèmes.',
+    icon: 'Wrench',
+    couleur: 'from-[#0A1B2F] to-[#1E2F47]',
+    features: ['Préventive & curative', 'Mises à jour & optimisation', 'Sécurité & sauvegardes']
+  },
+  {
+    id: 1,
+    titre: 'Déploiement des réseaux',
+    description: 'Le déploiement de réseaux connecte efficacement les utilisateurs.',
+    icon: 'Network',
+    couleur: 'from-[#0055FF] to-[#3377FF]',
+    features: ['Architecture LAN/WAN/Wi-Fi', 'Sécurité & VLAN', 'Supervision']
+  },
+];
 
 export function NstogoServices() {
-  const services = [
+  const navigate = useNavigate();
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    {
-      icon: <Wrench size={28}  />,
-      title: 'Maintenance informatique',
-      description: 'La maintenance informatique assure le bon fonctionnement des systèmes : prévention, dépannage, mise à niveau, sécurité, gestion des réseaux et données. Elle est essentielle pour optimiser la performance et la fiabilité.',
-      color: 'from-[#0A1B2F] to-[#1E2F47]',
-      features: ['Préventive & curative', 'Mises à jour & optimisation', 'Sécurité & sauvegardes']
-    },
-    
-    {
-      icon: <Network size={28}  />,
-      title: 'Déploiement des réseaux d’entreprise',
-      description: 'Le déploiement de réseaux d’entreprise connecte efficacement les utilisateurs, assure sécurité et performance, facilite l’accès aux ressources et améliore la productivité grâce à des technologies modernes et des compétences spécialisées.',
-      color: 'from-[#0055FF] to-[#3377FF]',
-      features: ['Architecture LAN/WAN/Wi‑Fi', 'Sécurité & segmentation (VLAN)', 'Qualité de service & supervision']
-    },
+  useEffect(() => {
+    fetch(`${API_URL}/api/services?actif=true`)
+      .then(res => res.json())
+      .then(data => {
+        setServices(data.services || []);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching services:', err);
+        setLoading(false);
+      });
+  }, []);
 
-    {
-      icon: <Cable size={28}  />,
-      title: 'Câblage réseau informatique',
-      description: 'Le câblage réseau connecte les équipements informatiques via des câbles Ethernet, coaxiaux ou fibre optique, assurant un échange de données fiable, sécurisé et rapide pour garantir le bon fonctionnement du réseau.',
-      color: 'from-[#FFB800] to-[#00D4D4]',
-      features: ['Cat6/Cat6a & fibre optique', 'Baie de brassage & test de lien', 'Normes & étiquetage']
-    },
+  if (loading) {
+    return (
+      <section className="section-padding bg-white dark:bg-[var(--bg)]">
+        <div className="container">
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-    {
-      icon: <ServerCog size={28}  />,
-      title: 'Configuration d’infrastructure réseau',
-      description: 'La configuration d’infrastructure réseau consiste à déployer et gérer les équipements physiques et logiciels pour assurer une connectivité fiable, sécurisée et performante, permettant le partage efficace de données, services et applications.',
-      color: 'from-[#1E2F47] to-[#0A1B2F]',
-      features: ['Switching & Routing', 'Pare‑feu & VPN', 'Haute dispo & monitoring']
-    },
-
-   /* {
-      icon: <Code2 size={28} />,
-      title: 'Développement Web',
-      description: 'Applications web sur mesure, sites vitrines et plateformes e-commerce performantes avec les dernières technologies.',
-      color: 'from-[#0055FF] to-[#3377FF]',
-      features: ['React & Vue.js', 'Backend robuste', 'API RESTful']
-    }, */
-   /* {
-      icon: <Cloud size={28} />,
-      title: 'Hébergement Cloud',
-      description: 'Infrastructure cloud sécurisée, scalable et haute disponibilité pour vos applications critiques.',
-      color: 'from-[#00D4D4] to-[#00A0A0]',
-      features: ['99.9% uptime', 'Auto-scaling', 'Backup quotidien']
-    }, */
-   /* {
-      icon: <Palette size={28} />,
-      title: 'Design UI/UX',
-      description: 'Interfaces modernes et intuitives centrées sur l\'expérience utilisateur pour maximiser vos conversions.',
-      color: 'from-[#FFB800] to-[#FF8C00]',
-      features: ['Design System', 'Prototypage', 'Tests utilisateurs']
-    }, */
-  /*  {
-      icon: <TrendingUp size={28} />,
-      title: 'Marketing Digital',
-      description: 'Stratégies digitales complètes pour augmenter votre visibilité et générer des leads qualifiés.',
-      color: 'from-[#8B5CF6] to-[#6366F1]',
-      features: ['SEO/SEA', 'Social Media', 'Analytics']
-    },*/
-   /* {
-      icon: <Database size={28} />,
-      title: 'Solutions Data',
-      description: 'Architectures data robustes et analyses avancées pour exploiter tout le potentiel de vos données.',
-      color: 'from-[#EC4899] to-[#F43F5E]',
-      features: ['Big Data', 'BI Dashboards', 'Data Mining']
-    },*/
-   /* {
-      icon: <Lock size={28} />,
-      title: 'Cybersécurité',
-      description: 'Protection complète de vos systèmes et données avec audits de sécurité et mises à jour continues.',
-      color: 'from-[#10B981] to-[#059669]',
-      features: ['Audit sécurité', 'Monitoring 24/7', 'Conformité RGPD']
-    },*/
-   /* {
-      icon: <Smartphone size={28} />,
-      title: 'Applications Mobile',
-      description: 'Apps natives iOS et Android ou solutions cross-platform avec React Native et Flutter.',
-      color: 'from-[#F59E0B] to-[#D97706]',
-      features: ['iOS & Android', 'PWA', 'App Store ready']
-    },*/
-   /* {
-      icon: <Globe size={28} />,
-      title: 'Consulting Digital',
-      description: 'Accompagnement stratégique pour votre transformation digitale et optimisation de vos processus.',
-      color: 'from-[#06B6D4] to-[#0891B2]',
-      features: ['Audit digital', 'Roadmap', 'Formation']
-    } */
-   
-  ];
+  const serviceList = services.length > 0 ? services : defaultServices;
 
   return (
-    <section id="services" className="section-padding bg-white relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-[var(--gray-50)] to-transparent pointer-events-none"></div>
-      
+    <section id="services" className="section-padding bg-white relative overflow-hidden dark:bg-[var(--bg)]">
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-[var(--gray-50)] to-transparent pointer-events-none dark:from-white/[0.06] dark:to-transparent"></div>
+
       <div className="container relative z-10">
-        {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16 lg:mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--primary)]/10 border border-[var(--primary)]/20 rounded-full mb-6">
-            <span className="text-sm font-semibold text-[var(--primary)]">
-              Nos Expertises
-            </span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--primary)]/10 border border-[var(--primary)]/20 rounded-full mb-6 dark:bg-[var(--primary)]/20 dark:border-[var(--primary)]/30">
+            <span className="text-sm font-semibold text-[var(--primary)]">Nos Expertises</span>
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-[var(--secondary)]">
-            Des solutions intelligentes
-            <span className="block gradient-text mt-2">
-              pour chaque besoin
-            </span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-[var(--secondary)] dark:text-slate-100">
+            Des solutions intelligentes<span className="block gradient-text mt-2">pour chaque besoin</span>
           </h2>
-          <p className="text-lg md:text-xl text-[var(--gray-600)] leading-relaxed">
-            Afin d’apporter un service fiable, conforme aux standards et adapté à la demande, Network Service est à l’écoute de vos besoins pour vous proposer des solutions sur mesure.
+          <p className="text-lg md:text-xl text-[var(--gray-600)] leading-relaxed dark:text-slate-300">
+            Afin d'apporter un service fiable, conforme aux standards et adapté à la demande, Network Service est à l'écoute de vos besoins.
           </p>
         </div>
 
-        {/* Services Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-          {services.map((service, index) => (
+          {serviceList.map((service, index) => (
             <div
-              key={index}
-              className="group relative bg-white rounded-2xl p-8 border-2 border-[var(--gray-200)] hover:border-[var(--primary)] transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+              key={service.id || index}
+              className="group relative bg-white rounded-2xl p-8 border-2 border-[var(--gray-200)] hover:border-[var(--primary)] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 dark:bg-white/[0.05] dark:border-white/10 dark:hover:border-white/20"
             >
-              {/* Icon */}
               <div className="mb-6">
-                <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${service.color} flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-shadow`}>
-                  {service.icon}
+                <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${service.couleur || 'from-[#0055FF] to-[#3377FF]'} flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-shadow`}>
+                  {iconMap[service.icon] || <Wrench size={28} />}
                 </div>
               </div>
 
-              {/* Content */}
-              <h3 className="text-xl font-bold text-[var(--secondary)] mb-3 group-hover:text-[var(--primary)] transition-colors">
-                {service.title}
+              <h3 className="text-xl font-bold text-[var(--secondary)] mb-3 group-hover:text-[var(--primary)] transition-colors dark:text-slate-100">
+                {service.titre}
               </h3>
-              <p className="text-[var(--gray-600)] leading-relaxed mb-4 text-sm">
+              <p className="text-[var(--gray-600)] leading-relaxed mb-4 text-sm dark:text-slate-300">
                 {service.description}
               </p>
 
-              {/* Features */}
               <div className="space-y-2">
-                {service.features.map((feature, idx) => (
+                {(service.features || []).map((feature: string, idx: number) => (
                   <div key={idx} className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-[var(--primary)]"></div>
-                    <span className="text-xs text-[var(--gray-500)] font-medium">{feature}</span>
+                    <span className="text-xs text-[var(--gray-500)] font-medium dark:text-slate-300/80">{feature}</span>
                   </div>
                 ))}
               </div>
 
-              {/* Hover Effect Line */}
-              <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--primary)] to-[var(--accent-turquoise)] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-b-xl"></div>
+              <button
+                onClick={() => navigate('/contact')}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-[var(--gray-50)] text-[var(--secondary)] hover:bg-[var(--primary)] hover:text-white transition-all duration-300 border border-[var(--gray-200)] hover:border-transparent dark:bg-white/[0.06] dark:text-slate-100 dark:border-white/10 dark:hover:bg-[var(--primary)] dark:hover:text-white"
+              >
+                Voir plus<span className="text-xs">→</span>
+              </button>
+
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--primary)] to-[var(--accent-turquoise)] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-b-xl dark:from-[var(--primary)] dark:to-[var(--accent-turquoise)]"></div>
             </div>
           ))}
         </div>
-
-        {/* <div className="text-center mt-16">
-          <p className="text-[var(--gray-600)] mb-4 text-lg">
-            Un projet spécifique en tête ?
-          </p>
-          <button 
-            onClick={() => {
-              const element = document.getElementById('contact');
-              if (element) element.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="text-[var(--primary)] font-semibold hover:underline text-lg transition-all inline-flex items-center gap-2 group"
-          >
-            Parlons-en ensemble
-            <span className="group-hover:translate-x-1 transition-transform">→</span>
-          </button>
-        </div> */}
-        
       </div>
     </section>
   );
